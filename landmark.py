@@ -3,23 +3,32 @@ import numpy
 import sys
 import numpy as np
 import face_alignment
+import threading
+import tkinter
 
-if __name__ == '__main__':
+flag = False
 
+def flag_run():
+    global flag
+    flag = not flag
+    print("Flag:", flag)
+
+def face_lmk():
     fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
     video_capture = cv2.VideoCapture(0)
-    process_this_frame = True
     i = 0
+    process_frame = True
     while True:
         ret, frame = video_capture.read()
         # Resize frame of video to 1/4 size 
         # frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-        if process_this_frame:
+        if process_frame:
             try:
-                preds = fa.get_landmarks(frame)
+                if flag:
+                    preds = fa.get_landmarks(frame)
 
-                for axis in preds[0]:
-                    cv2.circle(frame, tuple(axis), 1, (0, 255, 0), 2)
+                    for axis in preds[0]:
+                        cv2.circle(frame, tuple(axis), 1, (0, 255, 0), 2)
 
                 cv2.imshow('WebCam', frame)
 
@@ -28,12 +37,34 @@ if __name__ == '__main__':
                     break
             except Exception:
                 pass
-            
-        i += 1
-        if i % 7 != 0:
-            process_this_frame = False
-        else:
-            process_this_frame = True
+        if flag:
+            i += 1
+            if i % 8 != 0:
+                process_frame = False
+            else:
+                process_frame = True
+        
 
     video_capture.release()
     cv2.destroyAllWindows()
+
+def run():
+    thr_run = threading.Thread(target = face_lmk)
+    thr_run.start()
+    print("start run !")
+
+
+if __name__ == '__main__':
+    window = tkinter.Tk()
+    window.title("Face Recognition")
+    window.geometry("300x200")   
+
+    btn_1 = tkinter.Button(window, text = "Run !", command = run)
+    btn_1.pack(side="top", fill="both", expand="yes", padx="10", pady="10")
+    
+    btn_2 = tkinter.Button(window, text = "Landmark!", command = flag_run)
+    btn_2.pack(side="bottom", fill="both", expand="yes", padx="10", pady="10")
+
+    
+    window.mainloop()     
+    
