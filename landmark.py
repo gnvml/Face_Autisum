@@ -56,7 +56,7 @@ def run():
 
 if __name__ == '__main__':
     window = tkinter.Tk()
-    window.title("Face Recognition")
+    window.title("ECO4P")
     window.geometry("300x200")   
 
     btn_1 = tkinter.Button(window, text = "Run !", command = run)
@@ -66,5 +66,4 @@ if __name__ == '__main__':
     btn_2.pack(side="bottom", fill="both", expand="yes", padx="10", pady="10")
 
     
-    window.mainloop()     
-    
+    window.mainloop()
